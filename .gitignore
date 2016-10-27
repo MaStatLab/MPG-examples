@@ -1,0 +1,17 @@
+# Linux temp files
+*~
+
+# R data files
+*.rda
+
+# Eps files
+*.eps
+
+# Pdf files
+*.pdf
+
+# R files starting with temp
+temp*.R
+
+# Rhistory files
+.Rhistory
