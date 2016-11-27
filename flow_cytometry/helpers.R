@@ -58,7 +58,7 @@ RunMPG <- function(training, K = 100, truncation = "adaptive") {
   Y <- rbind(training$data.1, training$data.2, training$data.3)[idx, ]
   C <- c(rep(1, n.obs), rep(2, n.obs), rep(3, n.obs))[idx] 
   
-  prior <- list(K = K, truncation = truncation)
+  prior <- list(K = K, truncation_type = truncation)
   mcmc <- list(nburn = 5000, nsave = 500, nskip = 10, ndisplay = 100)
   return(mpg(Y, C, prior, mcmc))
 }
