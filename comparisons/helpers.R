@@ -138,12 +138,7 @@ RunSingleDataSet <- function(seed, f, name, n, K) {
                           mcmc = mcmc,
                           status = TRUE)
   
-  # Run MPG adaptive
-  adaptive.prior <- list(K = K, truncation_type = "adaptive")
-  mpg.adaptive.1 <- mpg(data$Y, data$C, prior = adaptive.prior, mcmc = mcmc)  
-  mpg.adaptive.0 <- mpg(data$Y, data$C0, prior = adaptive.prior, mcmc = mcmc)
-  
-  # Run MPG fixed
+  # Run CREMID
   fixed.prior <- list(K = K, truncation_type = "fixed")
   mpg.fixed.1 <- mpg(data$Y, data$C, prior = fixed.prior, mcmc = mcmc)
   mpg.fixed.0 <- mpg(data$Y, data$C0, prior = fixed.prior, mcmc = mcmc)
@@ -155,7 +150,6 @@ RunSingleDataSet <- function(seed, f, name, n, K) {
   x <- muller.1$grid
   y.true <- EvalTrueDensity(x, data$mu, data$sigma, data$probs)
   y.muller <- EvalMullerDensity(muller.1)
-  y.mpg.adaptive <- EvalMPGDensity(x, mpg.adaptive.1)
   y.mpg.fixed <- EvalMPGDensity(x, mpg.fixed.1)
   y.mc <- EvalMCDensity(x, mc)
   
@@ -168,19 +162,11 @@ RunSingleDataSet <- function(seed, f, name, n, K) {
   
   mpg.fixed.df <- data.frame(seed = seed,
                              name = name,
-                             method = "MPG fixed",
+                             method = "CREMID",
                              null = MPGTesting(mpg.fixed.0),
                              alternative = MPGTesting(mpg.fixed.1),
                              distance = MeasureL1Distance(y.true, y.mpg.fixed))
-  
-  mpg.adaptive.df <- data.frame(seed = seed,
-                                name = name,
-                                method = "MPG adaptive",
-                                null = MPGTesting(mpg.adaptive.0),
-                                alternative = MPGTesting(mpg.adaptive.1),
-                                distance = MeasureL1Distance(y.true, 
-                                                             y.mpg.adaptive))
-  
+
   mc.df <- data.frame(seed = seed,
                       name = name,
                       method = "Mclust",
@@ -188,7 +174,7 @@ RunSingleDataSet <- function(seed, f, name, n, K) {
                       alternative = NA,
                       distance = MeasureL1Distance(y.true, y.mc))
   
-  return(dplyr::bind_rows(muller.df, mpg.fixed.df, mpg.adaptive.df, mc.df))
+  return(dplyr::bind_rows(muller.df, mpg.fixed.df, mc.df))
 }
 
 

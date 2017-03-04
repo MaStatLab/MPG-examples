@@ -51,7 +51,7 @@ SubSample <- function(data, class, n.obs, dims) {
   return(data[sample(nrow(data), n.obs), dims])
 }
 
-RunMPG <- function(training, K = 100, truncation = "adaptive") {
+RunMPG <- function(training, K = 100, truncation = "fixed") {
   G <- length(training)
   n.obs <- nrow(training$data.1)
   idx <- sample(n.obs * G, n.obs * G)
