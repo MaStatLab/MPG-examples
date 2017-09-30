@@ -51,7 +51,7 @@ SubSample <- function(data, class, n.obs, dims) {
   return(data[sample(nrow(data), n.obs), dims])
 }
 
-RunMPG <- function(training, K = 100, truncation = "fixed") {
+RunCremid <- function(training, K = 100, truncation = "fixed") {
   G <- length(training)
   n.obs <- nrow(training$data.1)
   idx <- sample(n.obs * G, n.obs * G)
@@ -60,7 +60,7 @@ RunMPG <- function(training, K = 100, truncation = "fixed") {
   
   prior <- list(K = K, truncation_type = truncation)
   mcmc <- list(nburn = 5000, nsave = 500, nskip = 10, ndisplay = 100)
-  return(mpg(Y, C, prior, mcmc))
+  return(Fit(Y, C, prior, mcmc))
 }
 
 RunMClust <- function(training) {
@@ -70,10 +70,10 @@ RunMClust <- function(training) {
   return(list(fit.1 = fit.1, fit.2 = fit.2, fit.3 = fit.3))
 }
 
-GetMPGScore <- function(testing, ans) {
-  return(sum(LogScoreMPG(testing$data.1, 1, ans)) +
-           sum(LogScoreMPG(testing$data.2, 2, ans)) +
-           sum(LogScoreMPG(testing$data.3, 3, ans)))
+GetCremidScore <- function(testing, ans) {
+  return(sum(LogScoreCremid(testing$data.1, 1, ans)) +
+           sum(LogScoreCremid(testing$data.2, 2, ans)) +
+           sum(LogScoreCremid(testing$data.3, 3, ans)))
 }
 
 GetMCScore <- function(testing, mc) {
@@ -94,7 +94,7 @@ LogScoreMC <- function(x, mc) {
   return(log(output))
 }
 
-LogScoreMPG <- function(x, class, ans) {
+LogScoreCremid <- function(x, class, ans) {
   G <- dim(ans$chain$mu)[1]
   K <- ans$prior$K
   p <- ncol(ans$data$Y)
@@ -119,13 +119,30 @@ LogScoreMPG <- function(x, class, ans) {
   return(log(output / niter))
 }
 
-Histogram <- function(data, main = "", xlab = "") {
-  hist(data, xlim = c(0, 1), prob = TRUE, col = "grey", 
-       main = main, xlab = xlab)
+Histogram <- function(data, main = "", xlab = "", ...) {
+  hist(data, prob = TRUE, col = "grey", 
+       main = main, xlab = xlab, ...)
 }
 
-PlotHistograms <- function(ans) {
-  Histogram(ans$chain$rho, xlab = expression(rho))
-  Histogram(ans$chain$varphi, xlab = expression(varphi))
-  Histogram(ans$chain$epsilon, xlab = expression(epsilon))
+PlotHistograms <- function(ans, ...) {
+  Histogram(ans$chain$rho, xlab = expression(rho), ...)
+  Histogram(ans$chain$varphi, xlab = expression(varphi), ...)
+  Histogram(ans$chain$epsilon, xlab = expression(epsilon), ...)
 }
+
+ScatterPlotHyper <- function(ans) {
+  plot(ans$chain$epsilon, 
+       ans$chain$rho, 
+       xlab = expression(epsilon), 
+       ylab = expression(rho))
+  plot(ans$chain$varphi, 
+       ans$chain$rho,
+       xlab = expression(varphi), 
+       ylab = expression(rho))
+  plot(ans$chain$varphi, 
+       ans$chain$epsilon,
+       xlab = expression(varphi), 
+       ylab = expression(epsilon))
+}
+
+
