@@ -51,15 +51,13 @@ SubSample <- function(data, class, n.obs, dims) {
   return(data[sample(nrow(data), n.obs), dims])
 }
 
-RunCremid <- function(training, K = 100, truncation = "fixed") {
+RunCremid <- function(training, prior) {
   G <- length(training)
   n.obs <- nrow(training$data.1)
   idx <- sample(n.obs * G, n.obs * G)
   Y <- rbind(training$data.1, training$data.2, training$data.3)[idx, ]
   C <- c(rep(1, n.obs), rep(2, n.obs), rep(3, n.obs))[idx] 
-  
-  prior <- list(K = K, truncation_type = truncation)
-  mcmc <- list(nburn = 5000, nsave = 500, nskip = 10, ndisplay = 100)
+    mcmc <- list(nburn = 5000, nsave = 500, nskip = 10, ndisplay = 100)
   return(Fit(Y, C, prior, mcmc))
 }
 
@@ -126,8 +124,23 @@ Histogram <- function(data, main = "", xlab = "", ...) {
 
 PlotHistograms <- function(ans, ...) {
   Histogram(ans$chain$rho, xlab = expression(rho), ...)
+  x <- seq(0, 1, by = 0.00001)
+  lines(x, 
+        dbeta(x, ans$prior$tau_rho[1], ans$prior$tau_rho[2]), 
+        col = "red", 
+        lwd = 2)
   Histogram(ans$chain$varphi, xlab = expression(varphi), ...)
+  lines(x, 
+        dbeta(x, ans$prior$tau_varphi[1], ans$prior$tau_varphi[2]), 
+        col = "red", 
+        lwd = 2)
   Histogram(ans$chain$epsilon, xlab = expression(epsilon), ...)
+  x <- seq(ans$prior$epsilon_range[1], ans$prior$epsilon_range[2], by = 0.0001)
+  lx <- length(x)
+  lines(x, 
+        rep(1 / (ans$prior$epsilon_range[2] - ans$prior$epsilon_range[1]), lx), 
+        col = "red", 
+        lwd = 2)
 }
 
 ScatterPlotHyper <- function(ans) {
@@ -143,6 +156,24 @@ ScatterPlotHyper <- function(ans) {
        ans$chain$epsilon,
        xlab = expression(varphi), 
        ylab = expression(epsilon))
+}
+
+
+ExtractPosterior <- function(val, param, hyperparam) {
+  return(data.frame(value = val) %>%
+           dplyr::mutate(parameter = param,
+                         hyperparameter = hyperparam))
+}
+
+DensityPlot <- function(data, title, xlab) {
+  p <- data %>% 
+    dplyr::mutate(hyperparameter = as.factor(hyperparameter)) %>%
+    ggplot(aes(value, fill = hyperparameter, col= hyperparameter)) +
+    geom_density(alpha = 0.1, adjust = 5) +
+    scale_fill_discrete(name = title) +
+    scale_color_discrete(name = title) +
+    xlab(xlab)
+  return(p)
 }
 
 
