@@ -4,6 +4,7 @@ library(cremid)
 library(dplyr)
 library(mvtnorm)
 library(mclust)
+library(ggplot2)
 
 source("helpers.R")
 
@@ -322,8 +323,8 @@ varphi.alt <- bind_rows(
 
 pdf("varphi_sensitivity_alt.pdf", 
     pointsize = 18, width = 8, height = 5)
-DensityPlot(varphi.alt, expression(paste(a[varphi], " = ", 
-                                         b[varphi], " = ", 
+DensityPlot(varphi.alt, expression(paste(a[rho], " = ", 
+                                         b[rho], " = ", 
                                          a[varphi], " = ", 
                                          b[varphi])), expression(varphi)) + 
   xlim(0, 0.8) +
@@ -343,8 +344,8 @@ varphi.null <- bind_rows(
 
 pdf("varphi_sensitivity_null.pdf", 
     pointsize = 18, width = 8, height = 5)
-DensityPlot(varphi.null, expression(paste(a[varphi], " = ", 
-                                          b[varphi], " = ", 
+DensityPlot(varphi.null, expression(paste(a[rho], " = ", 
+                                          b[rho], " = ", 
                                           a[varphi], " = ", 
                                           b[varphi])), expression(varphi)) + 
   xlim(0, 0.75) +
