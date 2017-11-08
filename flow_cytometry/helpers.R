@@ -177,3 +177,19 @@ DensityPlot <- function(data, title, xlab) {
 }
 
 
+Clusters <- function(ans) {
+  n.save <- ans$mcmc$nsave
+  n.clusters <- data.frame(shared = rep(0, n.save),
+                           not.shared = rep(0, n.save))
+  for (it in 1:n.save) {
+    temp <- table(names(table(ans$chain$Z[it, ])) %in%
+                    which(ans$chain$R[it, ] == 1))
+    if ("FALSE" %in% names(temp)) {
+      n.clusters$shared[it] <- temp[["FALSE"]]
+    }
+    if ("TRUE" %in% names(temp)) {
+      n.clusters$not.shared[it] <- temp[["TRUE"]]
+    }
+  }
+  return(n.clusters)
+}

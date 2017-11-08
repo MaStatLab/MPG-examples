@@ -1,6 +1,6 @@
 options(stringsAsFactors = FALSE)
 
-library(MPG)
+library(cremid)
 library(MASS)
 library(dplyr)
 library(mclust)
@@ -8,7 +8,7 @@ library(DPpackage)
 library(ROCR)
 library(ggplot2)
 
-setwd("~/Dropbox/Duke/Thesis/locally_tied_stick_breaking/examples/2016_10_21/comparisons/")
+setwd("~/Dropbox/Duke/Thesis/locally_tied_stick_breaking/examples/MPG-examples/comparisons/")
 source("sample_data.R")
 source("helpers.R")
 source("plots.R")

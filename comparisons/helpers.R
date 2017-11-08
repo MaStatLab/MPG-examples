@@ -13,7 +13,7 @@ MakePriorMuller <- function(y, J) {
               tbinv = var(y)))
 }
 
-MPGTesting <- function(ans) {
+CremidTesting <- function(ans) {
   return(mean(ans$chain$rho) * mean(ans$chain$varphi) )
 }
 
@@ -36,7 +36,7 @@ EvalTrueDensity <- function(x, mu, sigma, probs) {
   return(output)
 }
 
-EvalMPGDensity <- function(x, ans) {
+EvalCremidDensity <- function(x, ans) {
   G <- dim(ans$chain$mu)[1]
   K <- ans$prior$K
   p <- ncol(ans$data$Y)
@@ -125,6 +125,7 @@ RunSingleDataSet <- function(seed, f, name, n, K) {
 
   # Generate data
   data <- match.fun(f)(n, seed)
+  cat("\tMuller\n")
   
   # Run Muller
   muller.1 <- HDPMdensity(y = data$Y,
@@ -139,10 +140,12 @@ RunSingleDataSet <- function(seed, f, name, n, K) {
                           status = TRUE)
   
   # Run CREMID
-  fixed.prior <- list(K = K, truncation_type = "fixed")
-  mpg.fixed.1 <- mpg(data$Y, data$C, prior = fixed.prior, mcmc = mcmc)
-  mpg.fixed.0 <- mpg(data$Y, data$C0, prior = fixed.prior, mcmc = mcmc)
+  cat("\tCremid\n")
+  fixed.prior <- list(K = K, truncation_type = "fixed", shared_alpha = FALSE)
+  cremid.fixed.1 <- Fit(data$Y, data$C, prior = fixed.prior, mcmc = mcmc)
+  cremid.fixed.0 <- Fit(data$Y, data$C0, prior = fixed.prior, mcmc = mcmc)
   
+  cat("\tMclust\n")
   # Run Mclust
   mc <- MClust(data)
   
@@ -150,7 +153,7 @@ RunSingleDataSet <- function(seed, f, name, n, K) {
   x <- muller.1$grid
   y.true <- EvalTrueDensity(x, data$mu, data$sigma, data$probs)
   y.muller <- EvalMullerDensity(muller.1)
-  y.mpg.fixed <- EvalMPGDensity(x, mpg.fixed.1)
+  y.cremid.fixed <- EvalCremidDensity(x, cremid.fixed.1)
   y.mc <- EvalMCDensity(x, mc)
   
   muller.df <- data.frame(seed = seed,
@@ -160,12 +163,12 @@ RunSingleDataSet <- function(seed, f, name, n, K) {
                           alternative = mean(muller.1$coef["eps"]),
                           distance = MeasureL1Distance(y.true, y.muller))
   
-  mpg.fixed.df <- data.frame(seed = seed,
+  cremid.fixed.df <- data.frame(seed = seed,
                              name = name,
-                             method = "CREMID",
-                             null = MPGTesting(mpg.fixed.0),
-                             alternative = MPGTesting(mpg.fixed.1),
-                             distance = MeasureL1Distance(y.true, y.mpg.fixed))
+                             method = "cremid",
+                             null = CremidTesting(cremid.fixed.0),
+                             alternative = CremidTesting(cremid.fixed.1),
+                             distance = MeasureL1Distance(y.true, y.cremid.fixed))
 
   mc.df <- data.frame(seed = seed,
                       name = name,
@@ -174,7 +177,7 @@ RunSingleDataSet <- function(seed, f, name, n, K) {
                       alternative = NA,
                       distance = MeasureL1Distance(y.true, y.mc))
   
-  return(dplyr::bind_rows(muller.df, mpg.fixed.df, mc.df))
+  return(dplyr::bind_rows(muller.df, cremid.fixed.df, mc.df))
 }
 
 

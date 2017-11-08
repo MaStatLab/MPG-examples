@@ -1,10 +1,10 @@
 options(stringsAsFactors = FALSE)
 
 library(MASS)
-library(MPG)
+library(cremid)
 
 setwd(file.path("~/Dropbox/Duke/Thesis/locally_tied_stick_breaking",
-                "examples/2016_10_21/calibration/"))
+                "examples/MPG-examples/calibration"))
 source("../comparisons/sample_data.R")
 
 # Number of mixture components.
@@ -52,11 +52,11 @@ Y <- data$Y[idx, ]
 C <- data$C[idx]
 
 # Run model.
-prior <- list(K = 100)
-ans <- mpg(Y, C, prior = prior)
+prior <- list(K = 100, shared_alpha = FALSE)
+ans <- Fit(Y, C, prior = prior)
 
 # Calibrate.
-cal <- calibrate(ans)
+cal <- Calibrate(ans)
 
 ScatterPlot <- function(Y, C, c, dim.1, dim.2, title) {
   plot(Y[C == c, ], 
