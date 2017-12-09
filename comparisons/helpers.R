@@ -14,7 +14,7 @@ MakePriorMuller <- function(y, J) {
 }
 
 CremidTesting <- function(ans) {
-  return(mean(ans$chain$rho) * mean(ans$chain$varphi) )
+  return(mean(ans$chain$rho) * mean(1 - ans$chain$varphi) )
 }
 
 EvalTrueDensity <- function(x, mu, sigma, probs) {

@@ -203,14 +203,14 @@ dev.off()
 # cremid.alt.fixed.3 <- RunCremid(alt.training, prior = prior.3)
 # save(cremid.alt.fixed.3, file = "cremid_alt_fixed_3.rda")
 # 
-# prior.4 <- list(K = K, 
-#                 truncation_type = "fixed", 
-#                 tau_rho = c(2, 2),
-#                 shared_alpha = FALSE)
+prior.4 <- list(K = K,
+                truncation_type = "fixed",
+                tau_rho = c(2, 2),
+                shared_alpha = FALSE)
 # cremid.null.fixed.4 <- RunCremid(null.training, prior = prior.4)
 # save(cremid.null.fixed.4, file = "cremid_null_fixed_4.rda")
-# cremid.alt.fixed.4 <- RunCremid(alt.training, prior = prior.4)
-# save(cremid.alt.fixed.4, file = "cremid_alt_fixed_4.rda")
+cremid.alt.fixed.4 <- RunCremid(alt.training, prior = prior.4)
+save(cremid.alt.fixed.4, file = "cremid_alt_fixed_4.rda")
 # 
 # prior.5 <- list(K = K, 
 #                 truncation_type = "fixed", 
